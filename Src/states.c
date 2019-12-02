@@ -581,3 +581,29 @@ void state_deli_ifrepeat() {
 		}
 	}
 }
+
+void state_alarm() {
+	scr_alarm();
+	while(true) {
+		keyAvailable = false;
+		/* Somehow this does not seem to work. */
+		HAL_SuspendTick();
+		HAL_PWR_EnterSLEEPMode(PWR_MAINREGULATOR_ON, PWR_SLEEPENTRY_WFI);
+		HAL_ResumeTick();
+
+		while(System_FSM == SYS_ALARM) {}
+		SystemClock_Config();
+
+		if(System_FSM == SYS_ALARM_CALLBACK) {
+			System_FSM = SYS_ALARM;
+			keyAvailable = false;
+			if(keyCache == KEY_A) {
+				keyCache = KEY_FAKE;
+				keyAvailable = false;
+				System_FSM = SYS_IDLE_PWDWAIT;
+			}
+		} else {
+			return;
+		}
+	}
+}

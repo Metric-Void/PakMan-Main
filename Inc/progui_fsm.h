@@ -67,6 +67,10 @@ enum SFSM {
 	/* Another package? */
 	SYS_DELI_IF_REPEAT, SYS_DELI_IF_REPEAT_CALLBACK,
 
+	/* Alarm is triggered. */
+	SYS_ALARM, SYS_ALARM_CALLBACK,
+
+	/* Things are not ready/ */
 	SYS_DEINIT
 };
 

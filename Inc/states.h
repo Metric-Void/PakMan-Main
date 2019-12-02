@@ -34,4 +34,7 @@ void state_deli_wait_choice();
 void state_deli_query();
 
 void state_deli_ifrepeat();
+
+void state_alarm();
+
 #endif

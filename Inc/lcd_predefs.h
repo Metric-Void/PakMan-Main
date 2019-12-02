@@ -40,4 +40,6 @@ void scr_deli_okfail();
 
 void scr_deli_if_repeat();
 
+void scr_alarm();
+
 #endif
