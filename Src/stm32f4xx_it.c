@@ -61,6 +61,7 @@ extern TIM_HandleTypeDef htim3;
 extern TIM_HandleTypeDef htim4;
 /* USER CODE BEGIN EV */
 extern void Alarm_Interrupt();
+extern void TimerIII_Interrupt();
 /* USER CODE END EV */
 
 /******************************************************************************/

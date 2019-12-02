@@ -258,6 +258,7 @@ void state_settings() {
 
 void state_hwreconf() {
 	scr_reconf_hw();
+	stop_monitor();
 	while(true){
 		keyAvailable = false;
 		/* Somehow this does not seem to work. */
@@ -295,7 +296,7 @@ void state_hwreconf_detect() {
 
 void state_hwreconf_done() {
 	scr_reconf_hw_done();
-	// TODO Set delay.
+	start_monitor();
 
 	startTimer(RTN_IDLE, 5);
 	while(System_FSM == SYS_RECONF_DONE && keyAvailable == false) {}

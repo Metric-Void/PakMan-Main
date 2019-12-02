@@ -24,11 +24,6 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
-/* USER CODE END Includes */
-
-/* Private typedef -----------------------------------------------------------*/
-/* USER CODE BEGIN PTD */
 #include "main.h"
 #include "progui_fsm.h"
 #include "lcd.h"
@@ -37,11 +32,17 @@
 #include "lcd_predefs.h"
 #include "states.h"
 #include "timer_iii.h"
+#include "alarm.h"
 #include <stdio.h>
 #include <stdbool.h>
 #include <usb_host.h>
 #include <usbh_hid.h>
 #include <stdarg.h>
+/* USER CODE END Includes */
+
+/* Private typedef -----------------------------------------------------------*/
+/* USER CODE BEGIN PTD */
+
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -152,9 +153,7 @@ int main(void)
   MX_USB_HOST_Init();
   MX_SPI3_Init();
   MX_TIM3_Init();
-
-  debug_print("Testing %d\n",1);
-  i2c_scanCabinets();
+  MX_TIM4_Init();
   /* USER CODE BEGIN 2 */
 	// Turn off LED D2. D2 means a clock failure.
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
@@ -162,6 +161,7 @@ int main(void)
 	System_FSM = SYS_IDLE;
 	LCD_begin(global_lcd);
 	scr_idle();
+	start_monitor();
 
 	keypad_init(KPD_ROW1, KPD_ROW2, KPD_ROW3, KPD_ROW4, KPD_COL1, KPD_COL2,
 			KPD_COL3, KPD_COL4);
@@ -515,7 +515,8 @@ static void MX_TIM3_Init(void)
   * @param None
   * @retval None
   */
-static void MX_TIM4_Init(void) {
+static void MX_TIM4_Init(void)
+{
 
   /* USER CODE BEGIN TIM4_Init 0 */
 
@@ -678,12 +679,6 @@ static void MX_GPIO_Init(void)
   GPIO_InitStruct.Pull = GPIO_NOPULL;
   HAL_GPIO_Init(GPIOA, &GPIO_InitStruct);
 
-  /*Configure GPIO pins : PB0 */
-  GPIO_InitStruct.Pin = GPIO_PIN_0;
-  GPIO_InitStruct.Mode = GPIO_MODE_OUTPUT_PP;
-  GPIO_InitStruct.Pull = GPIO_NOPULL;
-  HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
-
   /* EXTI interrupt init*/
   HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
   HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
@@ -692,7 +687,7 @@ static void MX_GPIO_Init(void)
 
 /* USER CODE BEGIN 4 */
 void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
-	uart_length = sprintf(uart_tx_buffer, (uint8_t)"Event callback triggered");
+	uart_length = sprintf(uart_tx_buffer, (uint8_t*) "Event callback triggered");
 	HAL_UART_Transmit(&huart4, uart_tx_buffer, (uint16_t) uart_length, 1000);
 	HID_KEYBD_Info_TypeDef *keybd_info;
 	uint8_t keycode;
@@ -701,7 +696,7 @@ void USBH_HID_EventCallback(USBH_HandleTypeDef *phost) {
 	if (HID_Handle->Init == USBH_HID_KeybdInit) {
 		keybd_info = USBH_HID_GetKeybdInfo(phost);
 		keycode = USBH_HID_GetASCIICode(keybd_info);
-		uart_length = sprintf(uart_tx_buffer, (uint8_t)"Key Pressed: 0x%x\n", keycode);
+		uart_length = sprintf(uart_tx_buffer, (uint8_t*) "Key Pressed: 0x%x\n", keycode);
 		HAL_UART_Transmit(&huart4, uart_tx_buffer, (uint16_t) uart_length,
 				1000);
 	}
@@ -727,7 +722,7 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin) {
 
 
 	printf("[GPIO_EXTI] Triggered.\n");
-	uart_length = sprintf(uart_tx_buffer, "[GPIO_EXTI] GPIO_Pin=%d triggered.\n", GPIO_Pin);
+	uart_length = sprintf(uart_tx_buffer, (uint8_t*) "[GPIO_EXTI] GPIO_Pin=%d triggered.\n", GPIO_Pin);
 	HAL_UART_Transmit(&huart4, uart_tx_buffer, (uint16_t)uart_length, 1000);
 	if (GPIO_Pin == GPIO_PIN_10) {
 		switch (System_FSM) {
