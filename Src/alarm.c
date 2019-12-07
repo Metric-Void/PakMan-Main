@@ -44,7 +44,9 @@ void timer_trigger() {
 
 	if(anyOffline) {
 		counter += 1;
+		debug_print("Cabinet missing.\n");
 	} else {
+		debug_print("No cabinet missing.\n");
 		counter = 0;
 	}
 

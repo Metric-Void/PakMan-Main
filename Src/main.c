@@ -158,6 +158,7 @@ int main(void)
 	// Turn off LED D2. D2 means a clock failure.
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_6, GPIO_PIN_SET);
 	Main_LCD_Init();
+	i2c_scanCabinets();
 	System_FSM = SYS_IDLE;
 	LCD_begin(global_lcd);
 	scr_idle();
