@@ -1,6 +1,7 @@
 #include "main.h"
 #include "stm32f4xx.h"
 #include <stdlib.h>
+#include <stdbool.h>
 
 #include "lcd_predefs.h"
 #include "lcd.h"
@@ -13,6 +14,9 @@
 #include "i2c_util.h"
 #include "locker.h"
 #include "timer_iii.h"
+
+extern bool alarm_triggered;
+extern bool alarm_handling;
 
 Cabinet * cabinetOnOperation;
 
@@ -90,6 +94,7 @@ void state_sys_auth() {
 			/* Panic: something else happened. Better leave this. */
 			LCD_clearScreen(global_lcd);
 			// free(keybd_cache);
+			alarm_handling = false;
 			keyAvailable = false;
 			LCD_cursorOff(global_lcd);
 			return;
@@ -107,6 +112,7 @@ void state_sys_auth() {
 	// Check the password and put into states;
 	LCD_cursorOff(global_lcd);
 	if (passmatch(keybd_cache)) {
+		alarm_triggered = false;
 		System_FSM = SYS_MGMT;
 	} else {
 		System_FSM = SYS_IDLEAUTH_WRONGPWD;
@@ -212,7 +218,7 @@ void state_openall_done(){
 
 	startTimer(RTN_IDLE, 5);
 	while(System_FSM == SYS_OPEN_ALL_DONE && keyAvailable == false) {}
-	System_FSM = SYS_IDLE;
+	cancelTimer(RTN_IDLE);
 
 	System_FSM = SYS_IDLE;
 }
@@ -274,12 +280,15 @@ void state_hwreconf() {
 			keyAvailable = false;
 			if(keyCache == KEY_A){
 				System_FSM = SYS_RECONF_DETECT;
+				start_monitor();
 				return;
 			} else if (keyCache == KEY_D){
 				System_FSM = SYS_SETTINGS;
+				start_monitor();
 				return;
 			}
 		} else {
+			start_monitor();
 			return;
 		}
 	}
@@ -301,7 +310,7 @@ void state_hwreconf_done() {
 	startTimer(RTN_IDLE, 5);
 	while(System_FSM == SYS_RECONF_DONE && keyAvailable == false) {}
 	System_FSM = SYS_IDLE;
-
+	alarm_handling = false;
 	return;
 }
 
@@ -585,6 +594,7 @@ void state_deli_ifrepeat() {
 
 void state_alarm() {
 	scr_alarm();
+	LCD_BkltOn();
 	while(true) {
 		keyAvailable = false;
 		/* Somehow this does not seem to work. */
@@ -601,7 +611,9 @@ void state_alarm() {
 			if(keyCache == KEY_A) {
 				keyCache = KEY_FAKE;
 				keyAvailable = false;
+				alarm_handling = true;
 				System_FSM = SYS_IDLE_PWDWAIT;
+				return;
 			}
 		} else {
 			return;

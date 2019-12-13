@@ -26,6 +26,7 @@ const uint8_t data_false = 0x00;
 void scanBus() {
 	bool known_ids[128];
 	memset(known_ids,0,sizeof(known_ids));
+	memset(addrList,0,sizeof(addrList));
 
 	for (uint16_t i = 0x09; i < 128; i += 1) {
 		// Send 0x05 ENQ. Device should reply with 0x06 ACK.

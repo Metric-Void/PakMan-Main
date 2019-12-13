@@ -71,6 +71,12 @@ void readOneKey() {
 		}
 	}
 
+	if(temp.row == 42) {
+		keyAvailable = false;
+		keyCache = KEY_FAKE;
+		return;
+	}
+
 	for (uint8_t i = 0; i < 4; i += 1) {
 		HAL_GPIO_WritePin(col[i].GPIOx, col[i].GPIO_Pin_x, GPIO_PIN_SET);
 		if (HAL_GPIO_ReadPin(GPIOx_watch.GPIOx, GPIOx_watch.GPIO_Pin_x)

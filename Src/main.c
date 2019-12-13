@@ -227,6 +227,9 @@ int main(void)
 		case SYS_DELI_IF_REPEAT:
 			state_deli_ifrepeat();
 			break;
+		case SYS_ALARM:
+			state_alarm();
+			break;
 		default:
 			System_FSM = SYS_IDLE;
 		}

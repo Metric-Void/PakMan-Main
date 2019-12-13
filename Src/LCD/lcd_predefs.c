@@ -186,9 +186,9 @@ void scr_deli_if_repeat() {
 void scr_alarm() {
 	LCD_clearScreen(global_lcd);
 	LCD_setCursor(global_lcd, 0, 0);
-	LCD_putstr(global_lcd, (uint8_t*) "ALARM // Hardware");
+	LCD_putstr(global_lcd, (uint8_t*) "ALARM // HARDWARE");
 	LCD_setCursor(global_lcd, 1, 0);
-	LCD_putstr(global_lcd, (uint8_t*) "changed unexpectedly.");
+	LCD_putstr(global_lcd, (uint8_t*) "CHANGED UNEXPECTEDLY");
 	LCD_setCursor(global_lcd, 2, 0);
 	LCD_putstr(global_lcd, (uint8_t*) "[A] Authenticate.");
 }

@@ -7,6 +7,7 @@
 
 bool armed;
 bool alarm_triggered;
+bool alarm_handling;
 
 void start_monitor();
 

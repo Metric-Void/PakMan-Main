@@ -7,12 +7,14 @@
 /* Not required. Just for noting myself. */
 extern bool armed;
 extern bool alarm_triggered;
+extern bool alarm_handling;
 
 uint8_t counter;
 
 void start_monitor() {
 	armed = true;
 	alarm_triggered = false;
+	alarm_handling = false;
 	counter = 0;
 	__TIM4_CLK_ENABLE();
 	HAL_TIM_Base_Init(&htim4);
@@ -48,12 +50,17 @@ void timer_trigger() {
 	} else {
 		debug_print("No cabinet missing.\n");
 		counter = 0;
+		if(alarm_triggered) {
+			alarm_triggered = false;
+			if(System_FSM != SYS_IDLE_PWDWAIT || System_FSM != SYS_IDLE_PWDWAIT_KEYREADY) System_FSM = SYS_IDLE;
+		}
 	}
 
 	if(counter >= ALARM_THRES) {
-		System_FSM = SYS_ALARM;
-		alarm_triggered = true;
-		state_alarm();
+		if(!alarm_handling) {
+			System_FSM = SYS_ALARM;
+			alarm_triggered = true;
+		}
 	}
 }
 
